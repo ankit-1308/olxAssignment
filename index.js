@@ -8,7 +8,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const passport = require("passport");
 
-
+const routes = require("./routers");
 const app = express();
 
 app.use(
@@ -31,7 +31,7 @@ app.use(function (req, res, next) {
     }
   });
 
-
+app.use("/api/auth", routes.auth);
 
 
 app.use(function (err, req, res, next) {

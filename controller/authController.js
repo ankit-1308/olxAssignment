@@ -15,7 +15,7 @@ class UserData {
 }
 
 
-class UserController{
+class AuthController{
     static userSignUp = async(req,res,next)=>{
 
         try{
@@ -55,7 +55,7 @@ class UserController{
                         expiresIn: "24h",
                     });
     
-                    return res.json({ token });
+                    return res.status(200).json({message:"User Logged In successfully",authToken: token });
                 });
             }catch(error){
                 error.status=401;
@@ -65,4 +65,4 @@ class UserController{
     }
 }
 
-module.exports = UserController;
+module.exports = AuthController;
