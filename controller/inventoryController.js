@@ -19,7 +19,7 @@ class InventoryController{
             const userId = req.user.user._id;
             const inventoryData = new InventoryData(req.body);
 
-            if(!inventoryData.sku || !inventoryData.type || inventoryData.status || !inventoryData.location || !inventoryData.attributes || !inventoryData.pricing)
+            if(!inventoryData.sku || !inventoryData.type || !inventoryData.status || !inventoryData.location || !inventoryData.attributes || !inventoryData.pricing)
                 return res.status(400).json({message:"All fields are required"});
             
             const newInventory = new InventoryModel(inventoryData);
