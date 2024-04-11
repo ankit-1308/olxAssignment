@@ -11,7 +11,7 @@ class InventoryData {
         this.metadata=metadata;
     }
 }
-
+ 
 class InventoryController{
 
     static createInventory = async(req,res,next)=>{
