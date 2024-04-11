@@ -36,7 +36,19 @@ class InventoryController{
         }catch(error){
             next(error)
         }
-        
+    }
+
+    static getInventoryViaSku = async(req,res,next)=>{
+        try{
+            const inventory = await InventoryModel.findOne({sku:req.params.sku});
+            if(!inventory)
+                res.status(404).json({message:`Inventory not found with the provided sku ${req.params.sku}`});
+
+            return res.status(200).json({message:"Inventory is fetched successfully",inventory:inventory});
+            
+        }catch(error){
+            next(error)
+        }
     }
 }
 
