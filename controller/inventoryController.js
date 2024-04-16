@@ -30,7 +30,7 @@ class InventoryController{
             const saveInventory = await newInventory.save();
             
             if(saveInventory)
-                return res.status(200).json({message:"Created a new Inventory Successfully", createdInventory:newInventory});
+                return res.status(200).json({message:"Created a new Inventory Successfully"});
             return res.status(500).json({messgae:"Failed to save inventory item"});
                 
         }catch(error){
