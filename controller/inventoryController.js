@@ -50,6 +50,35 @@ class InventoryController{
             next(error)
         }
     }
+    static updateInventory = async(req, res,next)=> {
+        try {
+            const { sku } = req.params;
+            const userId = req.user.user._id;
+            const {type,status,location,attributes,pricing} = req.body;
+            
+            const inventory = await InventoryModel.findOneAndUpdate(
+            { sku },
+            {
+                type,
+                status,
+                location,
+                attributes,
+                pricing,
+                $set: { 'metadata.updated_at':Date.now(), 'metadata.updated_by': userId }
+            },
+            { new: true }
+            );
+
+            if (!inventory) {
+                return res.status(404).json({ error: 'Inventory not found' });
+            }
+
+            res.status(200).json({message :"Updated the inventory",updatedInventory:inventory});
+        } catch (error) {
+            console.error('Error updating inventory:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
 }
 
 module.exports = InventoryController;
