@@ -79,6 +79,19 @@ class InventoryController{
             res.status(500).json({ error: 'Internal Server Error' });
         }
     }
+    static deleteInventory = async(req, res, next)=> {
+        try {
+          const { sku } = req.params;
+          const inventory = await InventoryModel.findOneAndDelete({ sku });
+          if (!inventory) {
+            return res.status(404).json({ error: 'Inventory not found' });
+          }
+          res.json({ message: 'Inventory deleted successfully' });
+        } catch (error) {
+          console.error('Error deleting inventory:', error);
+          res.status(500).json({ error: 'Internal Server Error' });
+        }
+      }
 }
 
 module.exports = InventoryController;
