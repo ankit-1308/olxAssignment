@@ -1,6 +1,7 @@
 const InventoryModel = require("../database/models/inventory");
+const {BADREQUEST} = require("../constant")
 
-class InventoryData {
+class InventoryDTO {
     constructor({sku,type,status,location,attributes,pricing,metadata}){
         this.sku=sku;
         this.type=type;
@@ -14,15 +15,15 @@ class InventoryData {
  
 class InventoryController{
 
-    static createInventory = async(req,res,next)=>{
+    createInventory = async(req,res,next)=>{
         try{
             const userId = req.user.user._id;
-            const inventoryData = new InventoryData(req.body);
+            const inventoryDTO = new InventoryDTO(req.body);
 
-            if(!inventoryData.sku || !inventoryData.type || !inventoryData.status || !inventoryData.location || !inventoryData.attributes || !inventoryData.pricing)
-                return res.status(400).json({message:"All fields are required"});
+            if(!inventoryDTO.sku || !inventoryDTO.type || !inventoryDTO.status || !inventoryDTO.location || !inventoryDTO.attributes || !inventoryDTO.pricing)
+                return res.status(BADREQUEST).json({message:"All fields are required"});
             
-            const newInventory = new InventoryModel(inventoryData);
+            const newInventory = new InventoryModel(inventoryDTO);
             
             newInventory.metadata.created_by=userId;
             newInventory.metadata.updated_by=userId;
@@ -38,7 +39,7 @@ class InventoryController{
         }
     }
 
-    static getInventoryViaSku = async(req,res,next)=>{
+    getInventoryViaSku = async(req,res,next)=>{
         try{
             const inventory = await InventoryModel.findOne({sku:req.params.sku});
             if(!inventory)
@@ -50,7 +51,8 @@ class InventoryController{
             next(error)
         }
     }
-    static updateInventory = async(req, res,next)=> {
+
+    updateInventory = async(req, res,next)=> {
         try {
             const { sku } = req.params;
             const userId = req.user.user._id;
@@ -68,18 +70,18 @@ class InventoryController{
             },
             { new: true }
             );
-
-            if (!inventory) {
+        
+            if (!inventory){
                 return res.status(404).json({ error: 'Inventory not found' });
             }
-
+ 
             res.status(200).json({message :"Updated the inventory",updatedInventory:inventory});
         } catch (error) {
             console.error('Error updating inventory:', error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
-    }
-    static deleteInventory = async(req, res, next)=> {
+    }  
+    deleteInventory = async(req, res, next)=>{
         try {
           const { sku } = req.params;
           const inventory = await InventoryModel.findOneAndDelete({ sku });
