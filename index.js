@@ -31,8 +31,8 @@ app.use(function (req, res, next) {
     }
   });
 
-app.use("/api/auth", routes.auth);
-app.use("/api/inventories", passport.authenticate("jwt", {session:false}), routes.inventory);
+// app.use("/api/auth", routes.auth);
+// app.use("/api/inventories", passport.authenticate("jwt", {session:false}), routes.inventory);
 
 
 app.use(function (err, req, res, next) {
