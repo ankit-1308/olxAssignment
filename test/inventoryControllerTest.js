@@ -3,7 +3,7 @@ const assert = require('assert');
 
 const InventoryModel = require("../database/models/inventory.js");
 const InventoryController = require("../controller/inventoryController.js");
-
+const inventoryController = new InventoryController();
 describe('InventoryController', () => {
   describe('createInventory', () => {
     it('should return 400 if required fields are missing', async () => {
@@ -17,7 +17,7 @@ describe('InventoryController', () => {
       };
       const next = sinon.spy();
 
-      await InventoryController.createInventory(req, res, next);
+      await inventoryController.createInventory(req, res, next);
 
       assert(res.status.calledWith(400));
       assert(res.json.calledWith({ message: 'All fields are required' }));
@@ -52,7 +52,7 @@ describe('InventoryController', () => {
   
       sinon.stub(InventoryModel.prototype, 'save').resolves(createdInventory);
   
-      await InventoryController.createInventory(req, res, next);
+      await inventoryController.createInventory(req, res, next);
 
       
       assert(res.status.calledWith(200));
@@ -74,7 +74,7 @@ describe('InventoryController', () => {
     
           sinon.stub(InventoryModel, 'findOne').resolves(foundInventory);
     
-          await InventoryController.getInventoryViaSku(req, res, next);
+          await inventoryController.getInventoryViaSku(req, res, next);
     
           assert(res.status.calledWith(200));
           assert(res.json.calledWith({ message: 'Inventory is fetched successfully', inventory: foundInventory }));
@@ -92,7 +92,7 @@ describe('InventoryController', () => {
     
           sinon.stub(InventoryModel, 'findOne').resolves(null);
     
-          await InventoryController.getInventoryViaSku(req, res, next);
+          await inventoryController.getInventoryViaSku(req, res, next);
     
           assert(res.status.calledWith(404));
           assert(res.json.calledWith({ message: 'Inventory not found with the provided sku NonExistentSKU' }));
@@ -111,7 +111,7 @@ describe('InventoryController', () => {
     
           sinon.stub(InventoryModel, 'findOne').rejects(mockError);
     
-          await InventoryController.getInventoryViaSku(req, res, next);
+          await inventoryController.getInventoryViaSku(req, res, next);
     
           assert(next.calledWith(mockError));
     
