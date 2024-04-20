@@ -1,5 +1,5 @@
 const InventoryModel = require("../database/models/inventory");
-
+const { v4: uuidv4 } = require('uuid');
 class InventoryData {
     constructor({sku,type,status,location,attributes,pricing,metadata}){
         this.sku=sku;
@@ -17,9 +17,11 @@ class InventoryController{
     static createInventory = async(req,res,next)=>{
         try{
             const userId = req.user.user._id;
+            req.body.sku= uuidv4();
             const inventoryData = new InventoryData(req.body);
-
-            if(!inventoryData.sku || !inventoryData.type || !inventoryData.status || !inventoryData.location || !inventoryData.attributes || !inventoryData.pricing)
+            
+            console.log(inventoryData);
+            if(!inventoryData.sku ||  !inventoryData.type || !inventoryData.status || !inventoryData.location || !inventoryData.attributes || !inventoryData.pricing)
                 return res.status(400).json({message:"All fields are required"});
             
             const newInventory = new InventoryModel(inventoryData);
@@ -33,6 +35,17 @@ class InventoryController{
                 return res.status(200).json({message:"Created a new Inventory Successfully", createdInventory: saveInventory});
             return res.status(500).json({messgae:"Failed to save inventory item"});
                 
+        }catch(error){
+            next(error)
+        }
+    }
+
+    static getInventories = async(req,res,next)=>{
+        try{
+            const inventories = await InventoryModel.find({});
+            
+            return res.status(200).json({message:"Inventories fetched successfully",inventories:inventories});
+            
         }catch(error){
             next(error)
         }

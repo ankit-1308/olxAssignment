@@ -27,7 +27,7 @@ class AuthController{
             const saveUser = await newUser.save();
 
             if(saveUser)
-                return res.status(200).json({message:"User SignUp successfull" , userCreated : newUser});
+                return res.status(200).json();
             return res.status(500).json({messgae:"Failed to create a user"});
         }catch(error){
             next(error);
