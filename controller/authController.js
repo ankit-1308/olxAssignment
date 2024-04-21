@@ -26,13 +26,13 @@
 //             const newUser = new UserModel(userData);
 //             const saveUser = await newUser.save();
 
-            if(saveUser)
-                return res.status(200).json();
-            return res.status(500).json({messgae:"Failed to create a user"});
-        }catch(error){
-            next(error);
-        }
-    }
+    //         if(saveUser)
+    //             return res.status(200).json();
+    //         return res.status(500).json({messgae:"Failed to create a user"});
+    //     }catch(error){
+    //         next(error);
+    //     }
+    // }
 
 //     static userLogIn = async(req,res,next)=>{
 //         passport.authenticate("user_login",async(err,user,info)=>{
