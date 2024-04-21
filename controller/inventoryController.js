@@ -1,4 +1,5 @@
 const InventoryModel = require("../database/models/inventory");
+const { v4: uuidv4 } = require('uuid');
 const {BADREQUEST} = require("../constant")
 
 class InventoryDTO {
@@ -18,6 +19,7 @@ class InventoryController{
     createInventory = async(req,res,next)=>{
         try{
             const userId = req.user.user._id;
+            req.body.sku= uuidv4();
             const inventoryDTO = new InventoryDTO(req.body);
 
             if(!inventoryDTO.sku || !inventoryDTO.type || !inventoryDTO.status || !inventoryDTO.location || !inventoryDTO.attributes || !inventoryDTO.pricing)
@@ -39,7 +41,18 @@ class InventoryController{
         }
     }
 
-    getInventoryViaSku = async(req,res,next)=>{
+    static getInventories = async(req,res,next)=>{
+        try{
+            const inventories = await InventoryModel.find({});
+            
+            return res.status(200).json({message:"Inventories fetched successfully",inventories:inventories});
+            
+        }catch(error){
+            next(error)
+        }
+    }
+
+    static getInventoryViaSku = async(req,res,next)=>{
         try{
             const inventory = await InventoryModel.findOne({sku:req.params.sku});
             if(!inventory)
