@@ -54,14 +54,12 @@ const InventorySchema = new Schema({
             default: Date.now 
         },
         created_by: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User', 
-            required: true 
+            type: String,
+            required: false 
         },
         updated_by: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            required: true
+            type: String,
+            required: false
         }
     }
    

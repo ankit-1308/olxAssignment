@@ -1,6 +1,11 @@
 const sinon=require('sinon');
 const assert = require('assert');
 
+const { v4: uuidv4 } = require('uuid');
+const {INVALID_REQUEST_BODY, INVENTORY_SAVE_FAILED, MISSING_SKU_PARAM, INVENTORY_NOT_FOUND, INTERNAL_ERROR} = require("../errors/errorCodes");
+const errors = require("../errors/index.js");
+const {BAD_REQUEST, OK,INTERNAL_SERVER_ERROR, NOT_FOUND} = require("../status-codes/status_codes");
+
 const InventoryModel = require("../database/models/inventory.js");
 const InventoryController = require("../controller/inventoryController.js");
 const inventoryController = new InventoryController();
@@ -8,7 +13,6 @@ describe('InventoryController', () => {
   describe('createInventory', () => {
     it('should return 400 if required fields are missing', async () => {
       const req = {
-        user: { user : {_id: '6618b2dc3e9bccc507404e98'}},
         body: {},
       };
       const res = {
@@ -19,15 +23,14 @@ describe('InventoryController', () => {
 
       await inventoryController.createInventory(req, res, next);
 
-      assert(res.status.calledWith(400));
-      assert(res.json.calledWith({ message: 'All fields are required' }));
+      assert(res.status.calledWith(BAD_REQUEST));
+      assert(res.json.calledWith({message :errors(INVALID_REQUEST_BODY)}));
       assert(next.notCalled);
     });
 
    
     it('should create a new inventory successfully', async () => {
       const req = {
-        user: { user: { _id: '6618b2dc3e9bccc507404e98' } },
         body: {
           sku: 'SKU123',
           type: 'type',
@@ -45,8 +48,8 @@ describe('InventoryController', () => {
       const next = sinon.spy();
       req.body.metadata.created_at = Date.now();
       req.body.metadata.updated_at = Date.now();
-      req.body.metadata.created_by = req.user.user._id;
-      req.body.metadata.updated_by = req.user.user._id;
+      req.body.metadata.created_by = uuidv4();
+      req.body.metadata.updated_by = uuidv4();
       
       const createdInventory = {...req.body, _id : "1234"};
   
@@ -55,8 +58,8 @@ describe('InventoryController', () => {
       await inventoryController.createInventory(req, res, next);
 
       
-      assert(res.status.calledWith(200));
-      assert(res.json.calledWith({ message: 'Created a new Inventory Successfully',createdInventory:createdInventory }));
+      assert(res.status.calledWith(OK));
+      assert(res.json.calledWith({createdInventory:createdInventory }));
       assert(next.notCalled);  
     
       assert(next.notCalled);
@@ -76,8 +79,8 @@ describe('InventoryController', () => {
     
           await inventoryController.getInventoryViaSku(req, res, next);
     
-          assert(res.status.calledWith(200));
-          assert(res.json.calledWith({ message: 'Inventory is fetched successfully', inventory: foundInventory }));
+          assert(res.status.calledWith(OK));
+          assert(res.json.calledWith({inventory: foundInventory }));
     
           InventoryModel.findOne.restore();
         });
@@ -94,8 +97,8 @@ describe('InventoryController', () => {
     
           await inventoryController.getInventoryViaSku(req, res, next);
     
-          assert(res.status.calledWith(404));
-          assert(res.json.calledWith({ message: 'Inventory not found with the provided sku NonExistentSKU' }));
+          assert(res.status.calledWith(NOT_FOUND));
+          assert(res.json.calledWith({ message:errors(MISSING_SKU_PARAM) }));
     
           InventoryModel.findOne.restore();
         });

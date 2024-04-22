@@ -1,4 +1,3 @@
-const { INTERNAL_SERVER_ERROR } = require("../status-codes/status_codes");
 
 module.exports = {
     // Common errors
@@ -15,5 +14,5 @@ module.exports = {
     INVENTORY_SAVE_FAILED: 'E009',
     // Errors for Update and Delete Inventory endpoints
     INVENTORY_NOT_FOUND: 'E010',
-    INTERNAL_SERVER_ERROR: 'E011',
+    INTERNAL_ERROR: 'E011',
   };
