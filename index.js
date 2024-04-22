@@ -1,7 +1,8 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const port = process.env.PORT || 3001
-
+const { INTERNAL_SERVER_ERROR} = require("../status-codes/status_codes");
+const { INTERNAL_SERVER_ERROR} = require("../errors/errorCodes");
 const cors = require("cors");
 const morgan = require("morgan");
 const express = require("express");
@@ -12,10 +13,7 @@ const routes = require("./routers");
 const app = express();
 
 app.use(
-  cors({
-    origin: JSON.parse(process.env.ALLOWED_ORIGINS),
-    optionsSuccessStatus: 200,
-  })
+  cors()
 );
 
 app.use(morgan("dev"));
@@ -26,13 +24,13 @@ app.use(function (req, res, next) {
     if (mongoose.connection.readyState === 1) {
       next();
     } else {
-      res.status(500);
-      res.json({ error: "Internal Server Error - Database Disconnected" });
+      res.status(INTERNAL_SERVER_ERROR);
+      res.json({ error: errors.getError(INTERNAL_SERVER_ERROR) });
     }
   });
 
-app.use("/api/auth", routes.auth);
-app.use("/api/inventories", passport.authenticate("jwt", {session:false}), routes.inventory);
+// app.use("/api/auth", routes.auth);
+// app.use("/api/inventories", passport.authenticate("jwt", {session:false}), routes.inventory);
 
 
 app.use(function (err, req, res, next) {
