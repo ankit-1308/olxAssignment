@@ -1,7 +1,8 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const port = process.env.PORT || 3001
-
+const { INTERNAL_SERVER_ERROR} = require("../status-codes/status_codes");
+const { INTERNAL_SERVER_ERROR} = require("../errors/errorCodes");
 const cors = require("cors");
 const morgan = require("morgan");
 const express = require("express");
@@ -23,8 +24,8 @@ app.use(function (req, res, next) {
     if (mongoose.connection.readyState === 1) {
       next();
     } else {
-      res.status(500);
-      res.json({ error: "Internal Server Error - Database Disconnected" });
+      res.status(INTERNAL_SERVER_ERROR);
+      res.json({ error: errors.getError(INTERNAL_SERVER_ERROR) });
     }
   });
 

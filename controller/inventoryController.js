@@ -1,7 +1,8 @@
 const InventoryModel = require("../database/models/inventory");
 const { v4: uuidv4 } = require('uuid');
-const {BADREQUEST} = require("../constant")
-
+const {INVALID_REQUEST_BODY, INVENTORY_SAVE_FAILED, MISSING_SKU_PARAM, INVENTORY_NOT_FOUND, INTERNAL_SERVER_ERROR} = require("../errors/errorCodes");
+const errors = require("../errors/index");
+const {BAD_REQUEST, OK, INTERNAL_SERVER_ERROR,  NOT_FOUND} = require("../status-codes/status_codes");
 class InventoryDTO {
     constructor({sku,type,status,location,attributes,pricing,metadata}){
         this.sku=sku;
@@ -23,7 +24,7 @@ class InventoryController{
             const inventoryDTO = new InventoryDTO(req.body);
 
             if(!inventoryDTO.sku || !inventoryDTO.type || !inventoryDTO.status || !inventoryDTO.location || !inventoryDTO.attributes || !inventoryDTO.pricing)
-                return res.status(BADREQUEST).json({message:"All fields are required"});
+                return res.status(BAD_REQUEST).json({message:errors.getError(INVALID_REQUEST_BODY)});
             
             const newInventory = new InventoryModel(inventoryDTO);
             
@@ -33,8 +34,8 @@ class InventoryController{
             const saveInventory = await newInventory.save();
             
             if(saveInventory)
-                return res.status(200).json({message:"Created a new Inventory Successfully", createdInventory: saveInventory});
-            return res.status(500).json({messgae:"Failed to save inventory item"});
+                return res.status(OK).json({ createdInventory: saveInventory});
+            return res.status(INTERNAL_SERVER_ERROR).json({messgae:errors.getError(INVENTORY_SAVE_FAILED)});
                 
         }catch(error){
             next(error)
@@ -45,7 +46,7 @@ class InventoryController{
         try{
             const inventories = await InventoryModel.find({});
             
-            return res.status(200).json({message:"Inventories fetched successfully",inventories:inventories});
+            return res.status(OK).json({inventories:inventories});
             
         }catch(error){
             next(error)
@@ -56,9 +57,9 @@ class InventoryController{
         try{
             const inventory = await InventoryModel.findOne({sku:req.params.sku});
             if(!inventory)
-                res.status(404).json({message:`Inventory not found with the provided sku ${req.params.sku}`});
+                res.status(NOT_FOUND).json({message:errors.getError(MISSING_SKU_PARAM)});
 
-            return res.status(200).json({message:"Inventory is fetched successfully",inventory:inventory});
+            return res.status(OK).json({inventory:inventory});
             
         }catch(error){
             next(error)
@@ -85,13 +86,13 @@ class InventoryController{
             );
         
             if (!inventory){
-                return res.status(404).json({ error: 'Inventory not found' });
+                return res.status(NOT_FOUND).json({ error: errors.getError(INVENTORY_NOT_FOUND) });
             }
  
-            res.status(200).json({message :"Updated the inventory",updatedInventory:inventory});
+            res.status(OK).json({updatedInventory:inventory});
         } catch (error) {
             console.error('Error updating inventory:', error);
-            res.status(500).json({ error: 'Internal Server Error' });
+            res.status(INTERNAL_SERVER_ERROR).json({ error: errors.getError(INTERNAL_SERVER_ERROR) });
         }
     }  
     deleteInventory = async(req, res, next)=>{
@@ -99,12 +100,12 @@ class InventoryController{
           const { sku } = req.params;
           const inventory = await InventoryModel.findOneAndDelete({ sku });
           if (!inventory) {
-            return res.status(404).json({ error: 'Inventory not found' });
+            return res.status(NOT_FOUND).json({ error: errors.getError(INVENTORY_NOT_FOUND) });
           }
           res.json({ message: 'Inventory deleted successfully' });
         } catch (error) {
           console.error('Error deleting inventory:', error);
-          res.status(500).json({ error: 'Internal Server Error' });
+          res.status(INTERNAL_SERVER_ERROR).json({ error: errors.getError(INTERNAL_SERVER_ERROR) });
         }
       }
 }
