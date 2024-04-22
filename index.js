@@ -17,7 +17,7 @@ app.use(
     optionsSuccessStatus: 200,
   })
 );
- 
+
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -31,8 +31,8 @@ app.use(function (req, res, next) {
     }
   });
 
-// app.use("/api/auth", routes.auth);
-// app.use("/api/inventories", passport.authenticate("jwt", {session:false}), routes.inventory);
+app.use("/api/auth", routes.auth);
+app.use("/api/inventories", passport.authenticate("jwt", {session:false}), routes.inventory);
 
 
 app.use(function (err, req, res, next) {
